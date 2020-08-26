@@ -2,7 +2,7 @@
 
 This is our implementation for the paper:
 
-*Shaoyun Shi, Hanxiong Chen, Weizhi Ma, Jiaxin Mao, Min Zhang, Yongfeng Zhang. 2020. [Neural Logic Reasoning](http://yongfeng.me/attach/shi-cikm2020.pdf) 
+*Shaoyun Shi, Hanxiong Chen, Weizhi Ma, Jiaxin Mao, Min Zhang, Yongfeng Zhang. 2020. [Neural Logic Reasoning](http://yongfeng.me/attach/shi-cikm2020.pdf). 
 In ACM CIKM'20.*
 
 **Please cite our paper if you use our codes. Thanks!**
