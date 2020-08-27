@@ -296,3 +296,5 @@ class NLR(BaseModel):
         out_dict[LOSS_L2] = self.l2(out_dict)
         out_dict[CHECK] = check_list
         return out_dict
+
+    
