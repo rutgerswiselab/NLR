@@ -23,7 +23,6 @@ from models.RecModel import RecModel
 from models.DeepModel import DeepModel
 from models.BiasedMF import BiasedMF
 from models.SVDPP import SVDPP
-from models.NeuMF import NeuMF
 from models.NAIS import NAIS
 from models.GRU4Rec import GRU4Rec
 from models.NARM import NARM
