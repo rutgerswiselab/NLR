@@ -42,6 +42,10 @@ scikit_learn==0.23.1
 
 -   The processed datasets are in  [`./dataset/`](https://github.com/rutgerswiselab/NLR/tree/master/dataset)
 
+- **Logic-1k**: Dataset for solving logical equations with 1k variables
+
+- **Logic-10k**: Dataset for solving logical equations with 10k variables
+
 - **ML-100k**: The origin dataset can be found [here](https://grouplens.org/datasets/movielens/100k/). 
 
 - **Amazon Datasets**: The origin dataset can be found [here](http://jmcauley.ucsd.edu/data/amazon/). 
