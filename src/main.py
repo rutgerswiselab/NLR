@@ -72,11 +72,13 @@ def build_run_environment(para_dict, dl_name, dp_name, model_name, runner_name):
     data_loader = dl_name(**dl_paras)
 
     # 需要由data_loader来append_his
+    # Need to use data_loader to append_his
     if 'all_his' in para_dict:
         data_loader.append_his(all_his=para_dict['all_his'], max_his=para_dict['max_his'],
                                neg_his=para_dict['neg_his'], neg_column=para_dict['neg_column'])
 
     # 如果是top n推荐，只保留正例，负例是训练过程中采样得到，并且将label转换为01二值
+    # If it's top n recommendation, only keep the positive examples, negative examples are sampled during training, also, convert the label into 0/1 binary values
     if para_dict['rank'] == 1:
         data_loader.label_01()
         if para_dict['drop_neg'] == 1:
@@ -88,11 +90,13 @@ def build_run_environment(para_dict, dl_name, dp_name, model_name, runner_name):
     data_processor = dp_name(**dp_paras)
 
     # # prepare train,test,validation samples 需要写在模型产生和训练之前，保证对不同模型相同random seed产生一样的测试负例
+    # # prepare train,test,validation samples need to put before model creation and training, to guarantee for different models but the same random seed, the same testing negative examples are created
     data_processor.get_train_data(epoch=-1, model=model_name)
     data_processor.get_validation_data(model=model_name)
     data_processor.get_test_data(model=model_name)
 
-    # 根据模型需要生成 数据集的特征，特征总共one-hot/multi-hot维度，特征每个field最大值和最小值，
+    # 根据模型需要生成 数据集的特征，特征总共one-hot/multi-hot维度，特征每个field最大值和最小值
+    # Generate the dataset features according to the need of the model, features are one-hot/multi-hot dimension, the max and min value of each field of the feature
     features, feature_dims, feature_min, feature_max = \
         data_loader.feature_info(include_id=model_name.include_id,
                                  include_item_features=model_name.include_item_features,
@@ -218,11 +222,13 @@ def main():
     data_loader = data_loader_name(**dl_para_dict)
 
     # 需要由data_loader来append_his
+    # Need to use data_loader to append_his
     if 'all_his' in origin_args:
         data_loader.append_his(all_his=origin_args.all_his, max_his=origin_args.max_his,
                                neg_his=origin_args.neg_his, neg_column=origin_args.neg_column)
 
     # 如果是top n推荐，只保留正例，负例是训练过程中采样得到，并且将label转换为01二值
+    # If it's top n recommendation, only keep the positive examples, negative examples are sampled during training, also, convert the label into 0/1 binary values
     if init_args.rank == 1:
         data_loader.label_01()
         if origin_args.drop_neg == 1:
@@ -235,12 +241,14 @@ def main():
     data_processor = data_processor_name(**dp_para_dict)
 
     # # prepare train,test,validation samples 需要写在模型产生和训练之前，保证对不同模型相同random seed产生一样的测试负例
+    # # prepare train,test,validation samples need to put before model creation and training, to guarantee for different models but the same random seed, the same testing negative examples are created
     data_processor.get_train_data(epoch=-1, model=model_name)
     data_processor.get_validation_data(model=model_name)
     data_processor.get_test_data(model=model_name)
 
     # create model
-    # 根据模型需要生成 数据集的特征，特征总共one-hot/multi-hot维度，特征每个field最大值和最小值，
+    # 根据模型需要生成 数据集的特征，特征总共one-hot/multi-hot维度，特征每个field最大值和最小值
+    # Generate the dataset features according to the need of the model, features are one-hot/multi-hot dimension, the max and min value of each field of the feature
     features, feature_dims, feature_min, feature_max = \
         data_loader.feature_info(include_id=model_name.include_id,
                                  include_item_features=model_name.include_item_features,
@@ -281,9 +289,11 @@ def main():
         utils.format_metric(runner.evaluate(model, data_processor.get_test_data(model=model), data_processor))
         if args.unlabel_test == 0 else '-1') + ' ' + ','.join(runner.metrics))
     # 如果load > 0，表示载入模型继续训练
+    # If load > 0, load the model and continue training
     if args.load > 0:
         model.load_model()
     # 如果train > 0，表示需要训练，否则直接测试
+    # If train > 0, it means training is needed, otherwise test directly
     if args.train > 0:
         runner.train(model, data_processor)
 
