@@ -69,6 +69,7 @@ class NLRRec(NLR):
 
         if self.seq_rec == 0:
             # 随机打乱顺序计算
+            # Randomly shuffle the ordering for computing
             all_as, all_avs = [], []
             for i in range(max(history_length)):
                 all_as.append(elements[:, i, :])  # B * V
@@ -94,6 +95,7 @@ class NLRRec(NLR):
             left_valid = all_avs[0]
         else:
             # # 按顺序计算
+            # # Compute according to the ordering
             tmp_a = None
             for i in range(max(history_length)):
                 tmp_a_valid = his_valid[:, i].unsqueeze(-1)  # B * 1
@@ -168,6 +170,7 @@ class NLRRec(NLR):
         elements = elements * his_valid.unsqueeze(-1)  # B * H * V
 
         # # 随机打乱顺序计算
+        # # Randomly shuffle the ordering for computing
         if self.seq_rec == 0:
             all_os, all_ovs = [], []
             for i in range(max(history_length)):
@@ -193,7 +196,8 @@ class NLRRec(NLR):
             or_vector = all_os[0]
             left_valid = all_ovs[0]
         else:
-            # # 按顺序计算o
+            # # 按顺序计算
+            # # Compute accordingly to the ordering
             tmp_o = None
             for i in range(max(history_length)):
                 tmp_o_valid = his_valid[:, i].unsqueeze(-1)  # B * 1
@@ -253,8 +257,12 @@ class NLRRec(NLR):
     def forward(self, feed_dict):
         """
         除了预测之外，还计算loss
-        :param feed_dict: 型输入，是个dict
+        :param feed_dict: 模型输入，是个dict
         :return: 输出，是个dict，prediction是预测值，check是需要检查的中间结果，loss是损失
+        
+        Except for making predictions, also compute the loss
+        :param feed_dict: model input, it's a dict
+        :return: output, it's a dict, prediction is the predicted value, check means needs to check the intermediate result, loss is the loss
         """
         out_dict = self.predict(feed_dict)
         out_dict = self.logic_regularizer(out_dict, train=feed_dict[TRAIN])
@@ -265,9 +273,11 @@ class NLRRec(NLR):
         # loss
         if feed_dict[RANK] == 1:
             # 计算topn推荐的loss，batch前一半是正例，后一半是负例
+            # Compute the loss of topn recommendation, the first half of the batch are the positive examples, the second half are negative examples
             loss = self.rank_loss(out_dict[PREDICTION], feed_dict[Y], feed_dict[REAL_BATCH_SIZE])
         else:
             # 计算rating/clicking预测的loss，默认使用mse
+            # Compute the loss of rating/clicking prediction, by default using mse
             if self.loss_sum == 1:
                 loss = torch.nn.MSELoss(reduction='sum')(out_dict[PREDICTION], feed_dict[Y])
             else:
