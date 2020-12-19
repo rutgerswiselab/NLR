@@ -154,6 +154,10 @@ class BaseRunner(object):
         记录时间用，self.time保存了[起始时间，上一步时间]
         :param start: 是否开始计时
         :return: 上一步到当前位置的时间
+        
+        Record the time, self.time records [starting time, time of last step]
+        :param start: if or not to start time counting
+        :return: the time to reach current position in the previous step
         """
         if self.time is None or start:
             self.time = [time()] * 2
@@ -168,6 +172,11 @@ class BaseRunner(object):
         :param batches: 所有batch的list，由DataProcessor产生
         :param train: 是否是训练阶段
         :return: 所有batch的list
+        
+        Add some control information into all batches, such as DROPOUT
+        :param batches: list of all batches, produced by DataProcessor
+        :param train: if or not this is training stage
+        :return: list of all batches
         """
         for batch in batches:
             batch[TRAIN] = train
@@ -181,6 +190,12 @@ class BaseRunner(object):
         :param data: 数据dict，由DataProcessor的self.get_*_data()和self.format_data_dict()系列函数产生
         :param data_processor: DataProcessor实例
         :return: prediction 拼接好的 np.array
+        
+        Predict, not training
+        :param model: model
+        :param data: data dict，produced by the self.get_*_data() and self.format_data_dict() function of DataProcessor
+        :param data_processor: DataProcessor instance
+        :return: prediction the concatenated np.array
         """
         gc.collect()
 
@@ -214,6 +229,13 @@ class BaseRunner(object):
         :param data_processor: DataProcessor实例
         :param epoch: 第几轮
         :return: 返回最后一轮的输出，可供self.check函数检查一些中间结果
+        
+        Training
+        :param model: model
+        :param data: data dict，produced by the self.get_*_data() and self.format_data_dict() function of DataProcessor
+        :param data_processor: DataProcessor instance
+        :param epoch: number of epoch
+        :return: return the output of the last round，can be used by self.check function to check some intermediate results
         """
         gc.collect()
         if model.optimizer is None:
@@ -261,16 +283,23 @@ class BaseRunner(object):
         检查是否终止训练，基于验证集
         :param model: 模型
         :return: 是否终止训练
+        
+        Check if or not to stop training, based on validation set
+        :param model: model
+        :return: if or not to stop training
         """
         metric = self.metrics[0]
         valid = self.valid_results
         # 如果已经训练超过20轮，且评价指标越小越好，且评价已经连续五轮非减
+        # If has been trained for over 20 rounds, and evaluation measure is the smaller the better, and the measure has been non-desceasing for five rounds
         if len(valid) > 20 and metric in utils.LOWER_METRIC_LIST and utils.strictly_increasing(valid[-5:]):
             return True
         # 如果已经训练超过20轮，且评价指标越大越好，且评价已经连续五轮非增
+        # If has been trained for over 20 rounds, and evaluation measure is the larger the better, and the measure has been non-increasing for five rounds
         elif len(valid) > 20 and metric not in utils.LOWER_METRIC_LIST and utils.strictly_decreasing(valid[-5:]):
             return True
         # 训练好结果离当前已经20轮以上了
+        # It has been more than 20 rounds from the best result
         elif len(valid) - valid.index(utils.best_result(metric, valid)) > 20:
             return True
         return False
@@ -281,15 +310,24 @@ class BaseRunner(object):
         :param model: 模型
         :param data_processor: DataProcessor实例
         :return:
+        
+        Model training
+        :param model: model
+        :param data_processor: DataProcessor instance
+        :return:
         """
 
         # 获得训练、验证、测试数据，epoch=-1不shuffle
+        # Obtain the training, validation and testing data, epoch=-1 no shuffling
         train_data = data_processor.get_train_data(epoch=-1, model=model)
         validation_data = data_processor.get_validation_data(model=model)
         test_data = data_processor.get_test_data(model=model) if data_processor.unlabel_test == 0 else None
-        self._check_time(start=True)  # 记录初始时间
+        # 记录初始时间
+        # Record start time
+        self._check_time(start=True)  
 
         # 训练之前的模型效果
+        # Model performance before training
         init_train = self.evaluate(model, train_data, data_processor) \
             if train_data is not None else [-1.0] * len(self.metrics)
         init_valid = self.evaluate(model, validation_data, data_processor) \
@@ -305,11 +343,13 @@ class BaseRunner(object):
             for epoch in range(self.epoch):
                 self._check_time()
                 # 每一轮需要重新获得训练数据，因为涉及shuffle或者topn推荐时需要重新采样负例
+                # Need to obtain training data again in each round, because it's related to shuffling or need to resample negative examples in topn recommendation
                 epoch_train_data = data_processor.get_train_data(epoch=epoch, model=model)
                 train_predictions, last_batch, mean_loss, mean_loss_l2 = \
                     self.fit(model, epoch_train_data, data_processor, epoch=epoch)
 
                 # 检查模型中间结果
+                # Check the intermediate results of the model
                 if self.check_epoch > 0 and (epoch == 1 or epoch % self.check_epoch == 0):
                     last_batch['mean_loss'] = mean_loss
                     last_batch['mean_loss_l2'] = mean_loss_l2
@@ -317,6 +357,7 @@ class BaseRunner(object):
                 training_time = self._check_time()
 
                 # # evaluate模型效果
+                # # evaluate the model performance
                 train_result = [mean_loss] + model.evaluate_method(train_predictions, train_data, metrics=['rmse'])
                 valid_result = self.evaluate(model, validation_data, data_processor) \
                     if validation_data is not None else [-1.0] * len(self.metrics)
@@ -329,17 +370,20 @@ class BaseRunner(object):
                 self.test_results.append(test_result)
 
                 # 输出当前模型效果
+                # Output the current model performance
                 logging.info("Epoch %5d [%.1f s]\t train= %s validation= %s test= %s [%.1f s] "
                              % (epoch + 1, training_time, utils.format_metric(train_result),
                                 utils.format_metric(valid_result), utils.format_metric(test_result),
                                 testing_time) + ','.join(self.metrics))
 
                 # 如果当前效果是最优的，保存模型，基于验证集
+                # If the current performance is the best, save the model, based on validate set
                 if utils.best_result(self.metrics[0], self.valid_results) == self.valid_results[-1]:
                     model.save_model()
                 # model.save_model(
                 #     model_path='../model/variable_tsne_logic_epoch/variable_tsne_logic_epoch_%d.pt' % (epoch + 1))
                 # 检查是否终止训练，基于验证集
+                # Check if to stop training, based on validate set
                 if self.eva_termination(model) and self.early_stop == 1:
                     logging.info("Early stop at %d based on validation result." % (epoch + 1))
                     break
@@ -376,6 +420,13 @@ class BaseRunner(object):
         :param data_processor: DataProcessor
         :param metrics: list of str
         :return: list of float 每个对应一个 metric
+        
+        evaluate the model performance
+        :param model: model
+        :param data: data dict，produced by the self.get_*_data() and self.format_data_dict() function of DataProcessor
+        :param data_processor: DataProcessor
+        :param metrics: list of str
+        :return: list of float, each corresponding to a metric
         """
         if metrics is None:
             metrics = self.metrics
@@ -387,6 +438,11 @@ class BaseRunner(object):
         检查模型中间结果
         :param model: 模型
         :param out_dict: 某一个batch的模型输出结果
+        :return:
+        
+        Check the intermediate result of the model
+        :param model: model
+        :param out_dict: model output of a certain batch
         :return:
         """
         # batch = data_processor.get_feed_dict(data, 0, self.batch_size, True)
@@ -411,6 +467,12 @@ class BaseRunner(object):
         :param data: 数据dict，由DataProcessor的self.get_*_data()和self.format_data_dict()系列函数产生
         :param data_processor: DataProcessor实例
         :return: prediction 拼接好的 np.array
+        
+        Predict, no training
+        :param model: model
+        :param data: data dict，produced by the self.get_*_data() and self.format_data_dict() functions of DataProcessor
+        :param data_processor: DataProcessor instance
+        :return: prediction, concatenated np.array
         """
         gc.collect()
 
