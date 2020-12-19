@@ -8,7 +8,7 @@ from utils.global_p import *
 
 
 class GRU4Rec(RecModel):
-    data_processor = 'HistoryDP'  # 默认data_processor
+    data_processor = 'HistoryDP'  # Default data_processor
 
     @staticmethod
     def parse_model_args(parser, model_name='GRU4Rec'):
