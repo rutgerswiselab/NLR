@@ -12,7 +12,7 @@ def qk_attention(query, key, value, valid=None, beta=1):
     :param key: ? * l * a
     :param value: ? * l * v
     :param valid: ? * l
-    :param beta: smooth softmax see in paper of NAIS
+    :param beta: smooth softmax
     :return: ? * v
     """
     ele_valid = 1 if valid is None else valid.unsqueeze(dim=-1)  # ? * l * 1
@@ -79,6 +79,21 @@ def rank_loss(prediction, label, real_batch_size, loss_sum):
     :param prediction: 预测值 [None]
     :param label: 标签 [None]
     :param real_batch_size: 观测值batch大小，不包括sample
+    :param loss_sum: 1=sum, other= mean
+    :return:
+    
+    Compute rank loss，similar to BPR-max，see reference:
+    @inproceedings{hidasi2018recurrent,
+      title={Recurrent neural networks with top-k gains for session-based recommendations},
+      author={Hidasi, Bal{\'a}zs and Karatzoglou, Alexandros},
+      booktitle={Proceedings of the 27th ACM International Conference on Information and Knowledge Management},
+      pages={843--852},
+      year={2018},
+      organization={ACM}
+    }
+    :param prediction: predicted value [None]
+    :param label: label [None]
+    :param real_batch_size: batch size of observation data, excluding sample
     :param loss_sum: 1=sum, other= mean
     :return:
     '''
