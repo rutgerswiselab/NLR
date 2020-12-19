@@ -8,7 +8,7 @@ from utils.global_p import *
 
 
 class SVDPP(RecModel):
-    data_processor = 'HistoryDP'  # 默认data_processor
+    data_processor = 'HistoryDP'  # Default data_processor
 
     def _init_weights(self):
         self.uid_embeddings = torch.nn.Embedding(self.user_num, self.ui_vector_size)
