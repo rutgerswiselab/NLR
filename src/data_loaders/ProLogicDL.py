@@ -19,6 +19,14 @@ class ProLogicDL(DataLoader):
         :param load_data: 是否要载入数据文件，否则只载入数据集信息
         :param sep: csv的分隔符
         :param seqs_sep: 变长column的内部分隔符，比如历史记录可能为'1,2,4'
+        
+        Initialization
+        :param path: path of the dataset
+        :param dataset: name of the dataset
+        :param label: label name of the columns
+        :param load_data: if or not to load the dataset file, otherwise only load the dataset information
+        :param sep: separator token of the csv
+        :param seq_sep: internal separator token of variable-length columns, e.g., user history records could be '1,2,4'
         """
         self.variable_file = os.path.join(os.path.join(path, dataset), dataset + VARIABLE_SUFFIX)
         self.variable_df = pd.read_csv(self.variable_file, sep='\t')
@@ -27,6 +35,9 @@ class ProLogicDL(DataLoader):
     def _load_info(self):
         """
         载入数据集信息文件，如果不存在则创建
+        :return:
+        
+        Load the dataset information file, if non-existing then create
         :return:
         """
         DataLoader._load_info(self)
