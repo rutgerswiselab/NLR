@@ -70,26 +70,26 @@ REAL_BATCH_SIZE = 'real_batch_size'
 TOTAL_BATCH_SIZE = 'total_batch_size'
 TRAIN = 'train'
 DROPOUT = 'dropout'
-SAMPLE_ID = 'sample_id'  # 在训练（验证、测试）集中，给每个样本编号。这是该column在data dict和feed dict中的名字。
+SAMPLE_ID = 'sample_id'  # 在 训练/验证/测试 集中，给每个样本编号。这是该column在data dict和feed dict中的名字 (In the training/validation/testing set, number each example. This is the name of the column in data dict and feed dict)
 
 # Hash
-K_ANCHOR_USER = 'anchor_user'  # hash模型用到的anchor user列名
-K_UID_SEG = 'uid_seg'  # hash模型用到的聚合uid，分隔不同uid的列名
-K_SAMPLE_HASH_UID = 'sample_hash_pos'  # hash模型用到的sample的uid桶的位置
+K_ANCHOR_USER = 'anchor_user'  # hash模型用到的anchor user列名 (the anchor user column name used by the hash model)
+K_UID_SEG = 'uid_seg'  # hash模型用到的聚合uid，分隔不同uid的列名 (the aggregated uid used by the hash model, seperate different uid column names)
+K_SAMPLE_HASH_UID = 'sample_hash_pos'  # hash模型用到的sample的uid桶的位置 (the position of the uid bucket of the sample used by the hash model)
 
 # ProLogic
-K_X_TAG = 'x_tag'  # 逻辑模型用到的，以区分变量是否取非
-K_OR_LENGTH = 'or_length'  # 逻辑模型用到的，以显示（析取范式中）每个or所连接的合取式中有多少个变量
-K_S_LENGTH = 'seq_length'  # 整个逻辑表达式的长度，包括逻辑符号
+K_X_TAG = 'x_tag'  # 逻辑模型用到的，以区分变量是否取非 (used by the logical model to distinguish if a variable is negated)
+K_OR_LENGTH = 'or_length'  # 逻辑模型用到的，以显示（析取范式中）每个or所连接的合取式中有多少个变量 (used by the logical model to show (in the disjunctive normal form) how many variables in each conjunctive form clause connected by OR)
+K_S_LENGTH = 'seq_length'  # 整个逻辑表达式的长度，包括逻辑符号 (length of the whole logical expression, including logical operators)
 
 # Syntax
 K_T_LENGTH = 'tree_length'
 
 # # out dict
 PRE_VALUE = 'pre_value'
-PREDICTION = 'prediction'  # 输出预测
-CHECK = 'check'  # 检查中间结果
-LOSS = 'loss'  # 输出损失
-LOSS_L2 = 'loss_l2'  # 输出l2损失
-EMBEDDING_L2 = 'embedding_l2'  # 当前batch涉及到的embedding的l2
-L2_BATCH = 'l2_batch'  # 当前计算的embedding的l2的batch大小
+PREDICTION = 'prediction'  # 输出预测 (output the prediction)
+CHECK = 'check'  # 检查中间结果 (check the intermediate results)
+LOSS = 'loss'  # 输出损失 (output the loss)
+LOSS_L2 = 'loss_l2'  # 输出l2损失 (output the l2 loss)
+EMBEDDING_L2 = 'embedding_l2'  # 当前batch涉及到的embedding的l2 (the l2 of the embeddings related to the current batch)
+L2_BATCH = 'l2_batch'  # 当前计算的embedding的l2的batch大小 (batch size of the currently computed embedding l2)
