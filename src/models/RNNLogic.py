@@ -98,6 +98,10 @@ class RNNLogic(DeepModel):
         除了预测之外，还计算loss
         :param feed_dict: 型输入，是个dict
         :return: 输出，是个dict，prediction是预测值，check是需要检查的中间结果，loss是损失
+        
+        Except for making predictions, also compute the loss
+        :param feed_dict: model input, it's a dict
+        :return: output, it's a dict, prediction is the predicted value, check means needs to check the intermediate result, loss is the loss
         """
         out_dict = self.predict(feed_dict)
         check_list = out_dict[CHECK]
