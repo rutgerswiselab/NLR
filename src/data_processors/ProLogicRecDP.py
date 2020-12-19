@@ -14,6 +14,10 @@ class ProLogicRecDP(HistoryDP):
         数据处理生成batch的命令行参数
         :param parser:
         :return:
+        
+        Command-line parameters to generate batches in data processing
+        :param parser:
+        :return:
         """
         parser.add_argument('--shuffle_his', type=int, default=0,
                             help='whether shuffle the his-list of each sent during training.')
@@ -34,6 +38,15 @@ class ProLogicRecDP(HistoryDP):
         :param neg_data: 负例的data dict，如果已经有可以传入拿来用
         :param special_cols: 需要特殊处理的column
         :return: batch的feed dict
+        
+        topn model will produce a batch, if doing training then need to sample a negative example for each positive example, and garanttee that for each batch the first half are positive examples and the second half are negative examples
+        :param data: data dict, produced by self.get_*_data() and self.format_data_dict() functions
+        :param batch_start: starting index of the batch
+        :param batch_size: batch size
+        :param train: training or testing
+        :param neg_data: data dict of negative examples, if alreay exist can use directly
+        :param special_cols: columns that need special treatment
+        :return: feed dict of the batch
         """
         feed_dict = DataProcessor.get_feed_dict(
             self, data, batch_start, batch_size, train, neg_data=neg_data,
