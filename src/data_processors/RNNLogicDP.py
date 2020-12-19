@@ -14,6 +14,7 @@ import re
 
 class RNNLogicDP(DataProcessor):
     # data dict中存储模型所需特征信息的key（负例feed_dict需要append在最后）
+    # The key in data dict to store the feature information needed by the model (feed_dict of negative examples should be appended at the end)
     data_columns = [X]
     info_columns = [SAMPLE_ID]
 
@@ -39,6 +40,7 @@ class RNNLogicDP(DataProcessor):
         data_loader = self.data_loader
         data = {}
         # label 记录在 'Y' 中
+        # label is recorded in 'Y'
         if data_loader.label in df.columns:
             data[Y] = np.array(df[data_loader.label], dtype=np.float32)
         else:
