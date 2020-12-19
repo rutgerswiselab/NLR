@@ -281,15 +281,21 @@ class BaseModel(torch.nn.Module):
     def forward(self, feed_dict):
         """
         除了预测之外，还计算loss
-        :param feed_dict: 型输入，是个dict
+        :param feed_dict: 模型输入，是个dict
         :return: 输出，是个dict，prediction是预测值，check是需要检查的中间结果，loss是损失
+        
+        Except for making prediction, also computes the loss
+        :param feed_dict: model input, it's a dict
+        :return: output, it's a dict, prediction is the predicted value, check means needs to check the intermediate results, loss is the loss
         """
         out_dict = self.predict(feed_dict)
         if feed_dict[RANK] == 1:
             # 计算topn推荐的loss，batch前一半是正例，后一半是负例
+            # Compute the loss of topn recommendation, the first half of batch are positive example, the second half are negative examples
             loss = self.rank_loss(out_dict[PREDICTION], feed_dict[Y], feed_dict[REAL_BATCH_SIZE])
         else:
             # 计算rating/clicking预测的loss，默认使用mse
+            # Compute the loss of rating/clicking prediction, by default use mse
             if self.loss_sum == 1:
                 loss = torch.nn.MSELoss(reduction='sum')(out_dict[PREDICTION], feed_dict[Y])
             else:
@@ -313,6 +319,20 @@ class BaseModel(torch.nn.Module):
         :param label: 标签 [None]
         :param real_batch_size: 观测值batch大小，不包括sample
         :return:
+        
+        Compute rank loss，similar to BPR-max, refer to paper:
+        @inproceedings{hidasi2018recurrent,
+          title={Recurrent neural networks with top-k gains for session-based recommendations},
+          author={Hidasi, Bal{\'a}zs and Karatzoglou, Alexandros},
+          booktitle={Proceedings of the 27th ACM International Conference on Information and Knowledge Management},
+          pages={843--852},
+          year={2018},
+          organization={ACM}
+        }
+        :param prediction: predicted value [None]
+        :param label: label [None]
+        :param real_batch_size: batch size of observation values, excluding sample
+        :return:
         '''
         pos_neg_tag = (label - 0.5) * 2
         observed, sample = prediction[:real_batch_size], prediction[real_batch_size:]
@@ -334,6 +354,10 @@ class BaseModel(torch.nn.Module):
         保存模型，一般使用默认路径
         :param model_path: 指定模型保存路径
         :return:
+        
+        Save the model, usually using the default directory/path
+        :param model_path: Specific the directory/path to save the model
+        :return:
         """
         if model_path is None:
             model_path = self.model_path
@@ -347,6 +371,10 @@ class BaseModel(torch.nn.Module):
         """
         载入模型，一般使用默认路径
         :param model_path: 指定模型载入路径
+        :return:
+        
+        Load the model, usually using the default directory/path
+        :param model_path: Specific the directory/path to load the model
         :return:
         """
         if model_path is None:
