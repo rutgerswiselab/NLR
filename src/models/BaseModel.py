@@ -17,8 +17,13 @@ from utils import utils
 class BaseModel(torch.nn.Module):
     """
     基类模型，一般新模型需要重载的函数有:
-    Base model, functions that children mdoels need to reimplement incluldes:
+    parse_model_args,
+    __init__,
+    _init_weights,
+    predict,
+    forward,
     
+    Base model, functions that children mdoels need to reimplement incluldes:
     parse_model_args,
     __init__,
     _init_weights,
@@ -49,9 +54,9 @@ class BaseModel(torch.nn.Module):
     include_user_features = True
     include_item_features = True
     include_context_features = True
-    data_loader = 'DataLoader'  # 默认data_loader
-    data_processor = 'DataProcessor'  # 默认data_processor
-    runner = 'BaseRunner'  # 默认runner
+    data_loader = 'DataLoader'  # Default data_loader
+    data_processor = 'DataProcessor'  # Default data_processor
+    runner = 'BaseRunner'  # Default runner
 
     @staticmethod
     def parse_model_args(parser, model_name='BaseModel'):
@@ -59,6 +64,11 @@ class BaseModel(torch.nn.Module):
         模型命令行参数
         :param parser:
         :param model_name: 模型名称
+        :return:
+        
+        Command-line parameters of the model
+        :param parser:
+        :param model_name: model name
         :return:
         """
         parser.add_argument('--loss_sum', type=int, default=1,
@@ -75,6 +85,12 @@ class BaseModel(torch.nn.Module):
         :param p: 预测值，np.array，一般由runner.predict产生
         :param data: data dict，一般由DataProcessor产生
         :param metrics: 评价指标的list，一般是runner.metrics，例如 ['rmse', 'auc']
+        :return:
+        
+        Compute the evaluation measures of the model
+        :param p: predicted value, np.array，usually produced by runner.predict
+        :param data: data dict，usually produced by DataProcessor
+        :param metrics: list of evaluate measures, usually being the runner.metrics, e.g., ['rmse', 'auc']
         :return:
         """
         l = data[Y]
@@ -174,12 +190,15 @@ class BaseModel(torch.nn.Module):
         self.total_parameters = self.count_variables()
         logging.info('# of params: %d' % self.total_parameters)
 
-        # optimizer 由runner生成并赋值
+        # optimizer 由runner生成并赋值 (produced and value-assigned by runner)
         self.optimizer = None
 
     def _init_weights(self):
         """
-        初始化需要的权重（带权重层）
+        初始化需要的权重(带权重层)
+        :return:
+        
+        Weighted needed by initializatioin (with weight layer)
         :return:
         """
         self.x_bn = torch.nn.BatchNorm1d(self.feature_num)
@@ -190,6 +209,9 @@ class BaseModel(torch.nn.Module):
         """
         模型所有参数数目
         :return:
+        
+        Total number of parameters of the model
+        :return:
         """
         total_parameters = sum(p.numel() for p in self.parameters() if p.requires_grad)
         return total_parameters
@@ -198,6 +220,10 @@ class BaseModel(torch.nn.Module):
         """
         模型自定义初始化函数，在main.py中会被调用
         :param m: 参数或含参数的层
+        :return:
+        
+        Model self-defined initialization function, will be called in main.py
+        :param m: parameters or layers with parameters
         :return:
         """
         if 'Linear' in str(type(m)):
@@ -211,6 +237,10 @@ class BaseModel(torch.nn.Module):
         """
         模型l2计算，默认是所有参数（除了embedding之外）的平方和，
         Embedding 的 L2是 只计算当前batch用到的
+        :return:
+        
+        Compute the l2 term of the model, by default it's the square sum of all parameters (except for embedding)
+        The l2 norm of embedding only consider those embeddings used in the current batch
         :return:
         """
         l2 = utils.numpy_to_torch(np.array(0.0, dtype=np.float32), gpu=True)
@@ -235,6 +265,10 @@ class BaseModel(torch.nn.Module):
         只预测，不计算loss
         :param feed_dict: 模型输入，是个dict
         :return: 输出，是个dict，prediction是预测值，check是需要检查的中间结果
+        
+        Only makes prediction, does not compute the loss
+        :param feed_dict: model input, it's a dict
+        :return: output, it's a dict, prediction is the predicted value, check means needs to check the intermediate results
         """
         check_list = []
         x = self.x_bn(feed_dict[X].float())
