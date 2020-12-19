@@ -19,6 +19,10 @@ class BaseRunner(object):
         跑模型的命令行参数
         :param parser:
         :return:
+        
+        Command-line parameters to run the model
+        :param parser:
+        :return:
         """
         parser.add_argument('--load', type=int, default=0,
                             help='Whether load model and continue to train')
@@ -68,6 +72,18 @@ class BaseRunner(object):
         :param metrics: 评价指标，逗号分隔
         :param check_epoch: 每几轮输出check一次模型中间的一些tensor
         :param early_stop: 是否自动提前终止训练
+        
+        Initialization
+        :param optimizer: name of optimizer
+        :param lr: learning rate
+        :param epoch: how many epochs to run
+        :param batch_size: training batch size
+        :param eval_batch_size: testing batch size
+        :param dropout: dropout ratio
+        :param l2: wight of l2 regularizer
+        :param metrics: evaluation metrics, seperated by comma
+        :param check_epoch: every check_epoch rounds, output the intermediate result tensor of the model
+        :param early_stop: if or not to do early stopping
         """
         self.optimizer_name = optimizer
         self.lr = lr
@@ -83,12 +99,14 @@ class BaseRunner(object):
         self.pre_gpu = pre_gpu
 
         # 把metrics转换为list of str
+        # Convert metrics to list of str
         self.metrics = metrics.lower().split(',')
         self.check_epoch = check_epoch
         self.early_stop = early_stop
         self.time = None
 
         # 用来记录训练集、验证集、测试集每一轮的评价指标
+        # Used to record the evaluation measures of training, validation and testing set in each round
         self.train_results, self.valid_results, self.test_results = [], [], []
 
     def _build_optimizer(self, model):
@@ -96,6 +114,10 @@ class BaseRunner(object):
         创建优化器
         :param model: 模型
         :return: 优化器
+        
+        Create the optimizer
+        :param model: model
+        :return: optimizer
         """
         weight_p, bias_p = [], []
         for name, p in model.named_parameters():
