@@ -14,6 +14,10 @@ def parse_global_args(parser):
     全局命令行参数
     :param parser:
     :return:
+    
+    Global command-line parameters
+    :param parser:
+    :return:
     """
     parser.add_argument('--gpu', type=str, default='0',
                         help='Set CUDA_VISIBLE_DEVICES')
@@ -35,6 +39,10 @@ def balance_data(data):
     让正负样本数接近，正负样本数差距太大时使用
     :param data:
     :return:
+    
+    Make the number of positive and negative examples close, use when the difference between the number of positive/negative examples is too large
+    :param data:
+    :return:
     """
     pos_indexes = np.where(data['Y'] == 1)[0]
     copy_num = int((len(data['Y']) - len(pos_indexes)) / len(pos_indexes))
@@ -51,6 +59,10 @@ def input_data_is_list(data):
     如果data是一个dict的list，则合并这些dict，在测试多个数据集比如验证测试同时计算时
     :param data: dict or list
     :return:
+    
+    If data is a list of dict, then merge these dict, when testing multiple datasets, e.g., when validation and testing are done concurrently
+    :param data: dict or list
+    :return:
     """
     if type(data) is list or type(data) is tuple:
         print("input_data_is_list")
@@ -64,6 +76,10 @@ def input_data_is_list(data):
 def format_metric(metric):
     """
     把计算出的评价指标转化为str，float保留四位小数
+    :param metric:
+    :return:
+    
+    Convert the evaluation measures into str, keep four decimal places for float
     :param metric:
     :return:
     """
@@ -86,6 +102,10 @@ def shuffle_in_unison_scary(data):
     shuffle整个数据集dict的内容
     :param data:
     :return:
+    
+    shuffle the contents of the dict of whole dataset
+    :param data:
+    :return:
     """
     rng_state = np.random.get_state()
     for d in data:
@@ -97,6 +117,11 @@ def shuffle_in_unison_scary(data):
 def best_result(metric, results_list):
     """
     求一个结果list中最佳的结果
+    :param metric:
+    :param results_list:
+    :return:
+    
+    Compute the best result in a list of results
     :param metric:
     :param results_list:
     :return:
@@ -113,6 +138,10 @@ def strictly_increasing(l):
     判断是否严格单调增
     :param l:
     :return:
+    
+    Test if monotonically increasing
+    :param l:
+    :return:
     """
     return all(x < y for x, y in zip(l, l[1:]))
 
@@ -120,6 +149,10 @@ def strictly_increasing(l):
 def strictly_decreasing(l):
     """
     判断是否严格单调减
+    :param l:
+    :return:
+    
+    Test if monotonically decreasing
     :param l:
     :return:
     """
@@ -131,6 +164,10 @@ def non_increasing(l):
     判断是否单调非增
     :param l:
     :return:
+    
+    Test if monotonically non-increasing
+    :param l:
+    :return:
     """
     return all(x >= y for x, y in zip(l, l[1:]))
 
@@ -138,6 +175,10 @@ def non_increasing(l):
 def non_decreasing(l):
     """
     判断是否单调非减
+    :param l:
+    :return:
+    
+    Test if monotonically non-decreasing
     :param l:
     :return:
     """
@@ -149,6 +190,10 @@ def monotonic(l):
     判断是否单调
     :param l:
     :return:
+    
+    Test if monotonic
+    :param l:
+    :return:
     """
     return non_increasing(l) or non_decreasing(l)
 
@@ -156,6 +201,12 @@ def monotonic(l):
 def numpy_to_torch(d, gpu=True, requires_grad=True):
     """
     numpy array转化为pytorch tensor，有gpu则放到gpu
+    :param d:
+    :param gpu: whether put tensor to gpu
+    :param requires_grad: whether the tensor requires grad
+    :return:
+    
+    Convert numpy array to pytorch tensor, if there is gpu then put into gpu
     :param d:
     :param gpu: whether put tensor to gpu
     :param requires_grad: whether the tensor requires grad
