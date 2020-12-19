@@ -16,7 +16,9 @@ from utils import utils
 
 class BaseModel(torch.nn.Module):
     """
-    基类模型，一般新模型需要重载的函数有
+    基类模型，一般新模型需要重载的函数有:
+    Base model, functions that children mdoels need to reimplement incluldes:
+    
     parse_model_args,
     __init__,
     _init_weights,
@@ -26,14 +28,22 @@ class BaseModel(torch.nn.Module):
 
     '''
     DataProcessor的format_data_dict()会用到这四个变量
-
     通常会把特征全部转换为multi-hot向量
-    例:uid(0-2),iid(0-2),u_age(0-2),i_xx(0-1)，
+    例:uid(0-2),iid(0-2),u_age(0-2),i_xx(0-1),
     那么uid=0,iid=1,u_age=1,i_xx=0会转换为100 010 010 10的稀疏表示0,4,7,9
     如果include_id=False，那么multi-hot不会包括uid,iid，即u_age=1,i_xx=0转化为010 10的稀疏表示 1,3
     include_user_features 和 include_item_features同理
-    append id 是指是否将 uid,iid append在输入'X'的最前，比如在append_id=True, include_id=False的情况下：
+    append id 是指是否将 uid,iid append在输入'X'的最前，比如在append_id=True, include_id=False的情况下:
     uid=0,iid=1,u_age=1,i_xx=0会转换为 0,1,1,3
+    
+    The format_data_dict() function of DataProcessor will use the following four parameters
+    Usually all features are converted into multi-hot vectors
+    e.g.: uid(0-2),iid(0-2),u_age(0-2),i_xx(0-1),
+    So uid=0,iid=1,u_age=1,i_xx=0 will be converted to the sparse representation of 100 010 010 10, i.e., 0,4,7,9
+    If include_id=False, then multi-hot will not include uid,iid, i.e., u_age=1,i_xx=0 will be converted to the sparse representation of 010 10, which are 1,3
+    Same for include_user_features and include_item_features
+    append id means if or not to append uid,iid before the input 'X', e.g., when append_id=True, include_id=False:
+    uid=0,iid=1,u_age=1,i_xx=0 will be converted to 0,1,1,3
     '''
     include_id = True
     include_user_features = True
