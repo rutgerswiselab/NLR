@@ -12,12 +12,17 @@ import json
 class DataLoader(object):
     """
     只负责load数据集文件，记录一些数据集信息
+    Only responsible for loading the dataset file, and recording some information of the dataset
     """
 
     @staticmethod
     def parse_data_args(parser):
         """
         data loader 的数据集相关的命令行参数
+        :param parser:
+        :return:
+        
+        Command-line parameters of the data loader related to the dataset
         :param parser:
         :return:
         """
@@ -44,6 +49,14 @@ class DataLoader(object):
         :param load_data: 是否要载入数据文件，否则只载入数据集信息
         :param sep: csv的分隔符
         :param seq_sep: 变长column的内部分隔符，比如历史记录可能为'1,2,4'
+        
+        Initialization
+        :param path: path of the dataset
+        :param dataset: name of the dataset
+        :param label: label name of the columns
+        :param load_data: if or not to load the dataset file, otherwise only load the dataset information
+        :param sep: separator token of the csv
+        :param seq_sep: internal separator token of variable-length columns, e.g., user history records could be '1,2,4'
         """
         self.dataset = dataset
         self.path = os.path.join(path, dataset)
@@ -75,6 +88,9 @@ class DataLoader(object):
         """
         载入用户和物品的csv特征文件
         :return:
+        
+        Load the csv feature file of users and items
+        :return:
         """
         self.user_df, self.item_df = None, None
         if os.path.exists(self.user_file) and self.load_data:
@@ -87,6 +103,9 @@ class DataLoader(object):
     def _load_data(self):
         """
         载入训练集、验证集、测试集csv文件
+        :return:
+        
+        Load the training set, validation set, and testing set csv file
         :return:
         """
         if os.path.exists(self.train_file) and self.load_data:
@@ -127,6 +146,9 @@ class DataLoader(object):
         """
         载入数据集信息文件，如果不存在则创建
         :return:
+        
+        Load the dataset information file, if does not exist then create the file
+        :return:
         """
         max_dict, min_dict = {}, {}
         if not os.path.exists(self.info_file) or self.load_data:
@@ -151,11 +173,13 @@ class DataLoader(object):
         self.column_min = min_dict
 
         # label的最小值和最大值
+        # Minimum value and maximum value of the labels
         self.label_max = self.column_max[self.label]
         self.label_min = self.column_min[self.label]
         logging.info("label: %d-%d" % (self.label_min, self.label_max))
 
         # 用户数目、物品数目
+        # number of users, number of items
         self.user_num, self.item_num = 0, 0
         if UID in self.column_max:
             self.user_num = self.column_max[UID] + 1
@@ -165,6 +189,7 @@ class DataLoader(object):
         logging.info("# of items: %d" % self.item_num)
 
         # 数据集的特征数目
+        # number of features of the dataset
         self.user_features = [f for f in self.column_max.keys() if f.startswith('u_')]
         logging.info("# of user features: %d" % len(self.user_features))
         self.item_features = [f for f in self.column_max.keys() if f.startswith('i_')]
@@ -177,6 +202,9 @@ class DataLoader(object):
     def _load_his(self):
         """
         载入数据集按uid合并的历史交互记录，两列 'uid' 和 'iids'，没有则创建
+        :return:
+        
+        Load the history interaction records of the dataset merged according to uid, two columns of 'uid' and 'iids', if non-existing then create
         :return:
         """
         if not self.load_data or UID not in self.train_df or IID not in self.train_df:
@@ -241,7 +269,7 @@ class DataLoader(object):
     def feature_info(self, include_id=True, include_item_features=True, include_user_features=True,
                      include_context_features=True):
         """
-        生成模型需要的特征数目、维度等信息，特征最终会在DataProcesso中r转换为multi-hot的稀疏标示，
+        生成模型需要的特征数目、维度等信息，特征最终会在DataProcessor中转换为multi-hot的稀疏标示，
         例:uid(0-2),iid(0-2),u_age(0-2),i_xx(0-1)，
         那么uid=0,iid=1,u_age=1,i_xx=0会转换为100 010 010 10的稀疏表示0,4,7,9
         :param include_id: 模型是否将uid,iid当成普通特征看待，将和其他特征一起转换到multi-hot embedding中，否则是单独两列
@@ -252,6 +280,18 @@ class DataLoader(object):
                  所有特征multi-hot之后的总维度，例 11
                  每个特征在mult-hot中所在范围的最小index，例[0, 3, 6, 9]
                  每个特征在mult-hot中所在范围的最大index，例[2, 5, 8, 10]
+                 
+        Generate the information needed by the model such as number of features and dimensions, features will be eventually converted to multi-hot sparse representation in DataProcessor
+        e.g., uid(0-2),iid(0-2),u_age(0-2),i_xx(0-1),
+        thus uid=0,iid=1,u_age=1,i_xx=0 will be converted to the sparse representation of 100 010 010 10, i.e., 0,4,7,9
+        :param include_id: if or not the model will consider uid,iid as normal features, will be converted to multi-hot embedding with other features, otherwise they will be two seperate columns
+        :param include_item_features: if or not the model will include item features
+        :param include_user_features: if or not the model will include user features
+        :param include_context_features: if or not the model will inculde context features
+        :return: all features, e.g., ['uid', 'iid', 'u_age', 'i_xx']
+                 Total dimension of all features after multi-hot, e.g., 11
+                 Each feature's minimum index in the multi-hot, e.g., [0, 3, 6, 9]
+                 Each feature's maximum index in the multi-hot, e.g., [2, 5, 8, 10]
         """
         features = []
         if include_id:
@@ -276,13 +316,13 @@ class DataLoader(object):
         return features, feature_dims, feature_min, feature_max
 
     def append_his(self, all_his=1, max_his=10, neg_his=0, neg_column=0):
-        assert not (all_his == 1 and self.train_df is None)  # 如果要考虑全部训练历史，训练集不能为空
-        his_dict, neg_dict = {}, {}  # 存储用户历史和负向历史的字典
+        assert not (all_his == 1 and self.train_df is None)  # 如果要考虑全部训练历史，训练集不能为空 (If to consider all training history, the training set can not be empty)
+        his_dict, neg_dict = {}, {}  # 存储用户历史和负向历史的字典 (Dictionary to save user's positive histories and negative histories)
         for df in [self.train_df, self.validation_df, self.test_df]:
-            if df is None or C_HISTORY in df:  # 空集合跳过，已经有了历史列也跳过
+            if df is None or C_HISTORY in df:  # 空集合跳过，已经有了历史列也跳过 (Skip empty sets, also the already exisited histories)
                 continue
-            history, neg_history = [], []  # 存储用户历史和负向历史的列表
-            if all_his != 1 or df is self.train_df:  # 如果是递增历史的形式，或者集合是训练集
+            history, neg_history = [], []  # 存储用户历史和负向历史的列表 (Dictionary to save user's positive histories and negative histories)
+            if all_his != 1 or df is self.train_df:  # 如果是递增历史的形式，或者集合是训练集 (If history records are increasing, or the set is training set)
                 uids, iids, labels = df[UID].tolist(), df[IID].tolist(), df[self.label].tolist()
                 for i, uid in enumerate(uids):
                     iid, label = iids[i], labels[i]
@@ -291,20 +331,20 @@ class DataLoader(object):
                     if uid not in neg_dict:
                         neg_dict[uid] = []
 
-                    # 取最后max_his个交互历史
+                    # 取最后max_his个交互历史 (Take the last max_his number of interaction history)
                     tmp_his = his_dict[uid] if max_his <= 0 else his_dict[uid][-max_his:]
                     tmp_neg = neg_dict[uid] if max_his <= 0 else neg_dict[uid][-max_his:]
                     history.append(str(tmp_his).replace(' ', '')[1:-1])
                     neg_history.append(str(tmp_neg).replace(' ', '')[1:-1])
 
-                    if label <= 0 and neg_his == 1 and neg_column == 0:  # 如果要把正负例放在一起
+                    if label <= 0 and neg_his == 1 and neg_column == 0:  # 如果要把正负例放在一起 (If to put positive and negative samples together)
                         his_dict[uid].append(-iid)
-                    elif label <= 0 and neg_column == 1:  # 如果要把负例单独放在一列
+                    elif label <= 0 and neg_column == 1:  # 如果要把负例单独放在一列 (If to put negative samples in a seperate column)
                         neg_dict[uid].append(iid)
-                    elif label > 0:  # 正例
+                    elif label > 0:  # 正例 (Positive examples)
                         his_dict[uid].append(iid)
 
-            if all_his == 1:  # 如果不是递增历史形式
+            if all_his == 1:  # 如果不是递增历史形式 (If history records are not increasing)
                 history, neg_history = [], []
                 for uid in df[UID].tolist():
                     if uid in his_dict:
@@ -324,6 +364,9 @@ class DataLoader(object):
         """
         如果是top n推荐，只保留正例，负例是训练过程中采样得到
         :return:
+        
+        If it's top n recommendation, only keep the positive examples, negative examples are sampled during training
+        :return:
         """
         logging.info('Drop Neg Samples...')
         if train and self.train_df is not None:
@@ -338,7 +381,10 @@ class DataLoader(object):
 
     def label_01(self, train=True, validation=True, test=True):
         """
-        讲label转换为01二值
+        将label转换为01二值
+        :return:
+        
+        Converte the label to 01 binary values
         :return:
         """
         logging.info("Transform label to 0-1")
