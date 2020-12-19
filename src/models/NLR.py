@@ -143,7 +143,7 @@ class NLR(BaseModel):
         constraint_valid = [x_valid.view([batch_size, -1])]  # B * ?
 
         # # 随机打乱顺序计算
-        # # Randomly shuffle the ordering
+        # # Randomly shuffle the ordering for computing
         all_os, all_ovs = [], []
         for o in range(len(or_length)):
             all_as, all_avs = [], []
