@@ -11,13 +11,21 @@ from utils.global_p import *
 
 
 class DataProcessor(object):
-    data_columns = [UID, IID, X]  # data dict中存储模型所需特征信息的key，需要转换为tensor
-    info_columns = [SAMPLE_ID, TIME]  # data dict中存储模额外信息的key
+    # data dict中存储模型所需特征信息的key，需要转换为tensor
+    # The key to store the feature information needed by the model in data dict
+    data_columns = [UID, IID, X]
+    # data dict中存储模型额外信息的key
+    # The key to store the extra information of the model in data dict
+    info_columns = [SAMPLE_ID, TIME]
 
     @staticmethod
     def parse_dp_args(parser):
         """
         数据处理生成batch的命令行参数
+        :param parser:
+        :return:
+        
+        Command-line parameters to generate batches in data processing
         :param parser:
         :return:
         """
@@ -50,6 +58,12 @@ class DataProcessor(object):
         :param model: Model对象
         :param rank: 1=topn推荐 0=评分或点击预测
         :param test_sample_n: topn推荐时的测试集负例采样比例 正:负=1:test_sample_n
+        
+        Initialization
+        :param data_loader: DataLoader object
+        :param model: Model object
+        :param rank: 1 = topn recommendation, 0 = rating or click prediction
+        :param test_sample_n: Ratio of negative sampling in the testing dataset in topn recommendation, positive : native = 1 : test_sample_n
         """
         self.data_loader = data_loader
         self.rank = rank
@@ -62,6 +76,7 @@ class DataProcessor(object):
 
         if self.rank == 1:
             # 生成用户交互的字典，方便采样负例时查询，不要采到正例
+            # Generate the dict of user interactoins, convenient for querying when doing negative sampling to guaranttee positive examples are not sampled
             self.train_history_pos = defaultdict(set)
             for uid in data_loader.train_user_pos.keys():
                 self.train_history_pos[uid] = set(data_loader.train_user_pos[uid])
@@ -90,6 +105,12 @@ class DataProcessor(object):
         :param epoch: <0则不shuffle
         :param model: Model类
         :return: 字典dict
+        
+        Convert the training dataset Dataframe in the dataloader into the needed dict and return, need to shuffle in every round
+        This dict will be used to generate batches
+        :param epoch: if < 0 then no shuffling
+        :param model: Model class
+        :return: dict
         """
         if self.train_data is None:
             logging.info('Prepare Train Data...')
@@ -106,6 +127,12 @@ class DataProcessor(object):
         该字典会被用来生成batches
         :param model: Model类
         :return: 字典dict
+        
+        Convert the validate datasest Dataframe in the dataloader into the needed dict and return
+        If doing topn recommendation then for each positive example sample test_sample_n number of negative examples
+        This dict will be used to generate batches
+        :param model: Model class
+        :return: dict
         """
         if self.validation_data is None:
             logging.info('Prepare Validation Data...')
@@ -127,6 +154,12 @@ class DataProcessor(object):
         该字典会被用来生成batches
         :param model: Model类
         :return: 字典dict
+        
+        Convert the testing datasest Dataframe in the dataloader into the needed dict and return
+        If doing topn recommendation then for each positive example sample test_sample_n number of negative examples
+        This dict will be used to generate batches
+        :param model: Model class
+        :return: dict
         """
         if self.test_data is None:
             logging.info('Prepare Test Data...')
