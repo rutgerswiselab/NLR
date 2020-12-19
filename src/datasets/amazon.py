@@ -16,14 +16,16 @@ RAW_DATA = '/path/to/raw/data/'
 
 
 # http://jmcauley.ucsd.edu/data/amazon/
-# format amazon 5-core 数据集
+# format amazon 5-core dataset
 def format_5core(in_json, out_csv, label01=True):
     # 读入json文件
+    # read in the json file
     records = []
     for line in open(in_json, 'r'):
         record = json.loads(line)
         records.append(record)
-    # 讲json信息转换问pandas DataFrame
+    # 将json信息转换为pandas DataFrame
+    # Convert json information to pandas DataFrame
     out_df = pd.DataFrame()
     out_df[UID] = [r['reviewerID'] for r in records]
     out_df[IID] = [r['asin'] for r in records]
@@ -31,23 +33,28 @@ def format_5core(in_json, out_csv, label01=True):
     out_df[TIME] = [r['unixReviewTime'] for r in records]
 
     # 按时间、uid、iid排序
+    # Sorted as time, uid, iid order
     out_df = out_df.sort_values(by=[TIME, UID, IID])
     out_df = out_df.drop_duplicates([UID, IID]).reset_index(drop=True)
 
     # 给uid编号，从1开始
+    # Number the uids, begining from 1
     uids = sorted(out_df[UID].unique())
     uid_dict = dict(zip(uids, range(1, len(uids) + 1)))
     out_df[UID] = out_df[UID].apply(lambda x: uid_dict[x])
 
     # 给iid编号，从1开始
+    # Number the iids, begining from 1
     iids = sorted(out_df[IID].unique())
     iid_dict = dict(zip(iids, range(1, len(iids) + 1)))
     out_df[IID] = out_df[IID].apply(lambda x: iid_dict[x])
 
     # # 丢掉时间戳
+    # # Drop the timestamp
     # out_df = out_df.drop(columns=TIME)
 
-    # 如果要format成0（负向）- 1（正向）两种label，而不是评分，则认为评分大于3的表示喜欢为1，否则不喜欢为0
+    # 如果要format成0（负向）和 1（正向）两种label，而不是评分，则认为评分大于3的表示喜欢为1，否则不喜欢为0
+    # If format into two labels 0 (negative) and 1 (positive), rather than ratings, then consider ratings > 3 as positive 1, otherse as negative 0
     if label01:
         out_df[LABEL] = out_df[LABEL].apply(lambda x: 1 if x > 3 else 0)
     print('label:', out_df[LABEL].min(), out_df[LABEL].max())
