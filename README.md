@@ -1,11 +1,11 @@
 # Neural Logic Reasoning
 
-This is our implementation for the paper:
+This repository includes our implementation for Neural Logic Reasoning (NLR):
 
-*Shaoyun Shi, Hanxiong Chen, Weizhi Ma, Jiaxin Mao, Min Zhang, Yongfeng Zhang. 2020. [Neural Logic Reasoning](http://yongfeng.me/attach/shi-cikm2020.pdf). 
-In ACM CIKM'20.*
+*Shaoyun Shi, Hanxiong Chen, Weizhi Ma, Jiaxin Mao, Min Zhang, Yongfeng Zhang. 2020. [Neural Logic Reasoning](https://arxiv.org/pdf/2008.09514.pdf). 
+In Proceedings of the 29th ACM International Conference on Information and Knowledge Management (CIKM'20).*
 
-**Please cite our paper if you use our codes. Thanks!**
+# Refernece
 
 Author: Shaoyun Shi (shisy13 AT gmail.com)
 
