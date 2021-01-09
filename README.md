@@ -5,21 +5,19 @@ This repository includes our implementation for Neural Logic Reasoning (NLR):
 *Shaoyun Shi, Hanxiong Chen, Weizhi Ma, Jiaxin Mao, Min Zhang, Yongfeng Zhang. 2020. [Neural Logic Reasoning](https://arxiv.org/pdf/2008.09514.pdf). 
 In Proceedings of the 29th ACM International Conference on Information and Knowledge Management (CIKM'20).*
 
-# Refernece
+## Refernece
 
-Author: Shaoyun Shi (shisy13 AT gmail.com)
+For inquiries contact Shaoyun Shi (shisy13@gmail.com) or Yongfeng Zhang (yongfeng.zhang@rutgers.edu)
 
 ```
-@inproceedings{shi2020nlr,
+@inproceedings{shi2020neural,
   title={Neural Logic Reasoning},
-  author={Shaoyun Shi, Hanxiong Chen, Weizhi Ma, Jiaxin Mao, Min Zhang, Yongfeng Zhang},
-  booktitle={Proceedings of the 29th ACM International Conference on Information and Knowledge Management},
-  year={2020},
-  organization={ACM}
+  author={Shi, Shaoyun and Chen, Hanxiong and Ma, Weizhi and Mao, Jiaxin and Zhang, Min and Zhang, Yongfeng},
+  booktitle={Proceedings of the 29th ACM International Conference on Information \& Knowledge Management},
+  pages={1365--1374},
+  year={2020}
 }
 ```
-
-
 
 ## Environments
 
@@ -40,7 +38,7 @@ scikit_learn==0.23.1
 
 ## Datasets
 
--   The processed datasets are in  [`./dataset/`](https://github.com/rutgerswiselab/NLR/tree/master/dataset)
+- The processed datasets are in  [`./dataset/`](https://github.com/rutgerswiselab/NLR/tree/master/dataset)
 
 - **Logic-1k**: Dataset for solving logical equations with 1k variables
 
