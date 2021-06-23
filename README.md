@@ -17,6 +17,13 @@ For inquiries contact Shaoyun Shi (shisy13@gmail.com) or Yongfeng Zhang (yongfen
   pages={1365--1374},
   year={2020}
 }
+@inproceedings{chen2021neural,
+  title={Neural Collaborative Reasoning},
+  author={Chen, Hanxiong and Shi, Shaoyun and Li, Yunqi and Zhang, Yongfeng},
+  booktitle={Proceedings of the Web Conference 2021},
+  pages={1516--1527},
+  year={2021}
+}
 ```
 
 ## Environments
